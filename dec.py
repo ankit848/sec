@@ -1,33 +1,21 @@
-import tkinter as tk
-from tkinter import filedialog
-import zlib
-import base64
 import marshal
 
-def decode_command(encoded_command):
-    # Reverse the encoding process
-    decoded_b64 = base64.b64decode(encoded_command[::-1])
-    decompressed_data = zlib.decompress(decoded_b64[::-1])
-    command = marshal.loads(decompressed_data)
-    return command
+def decode_file(encoded_file):
+    with open(encoded_file, 'rb') as f:
+        encoded_data = f.read()
 
-def upload_file():
-    file_path = filedialog.askopenfilename()
-    if file_path:
-        with open(file_path, 'r') as file:
-            encoded_command = file.read().strip()
-            decoded_command = decode_command(encoded_command)
-            exec(decoded_command)
-            result_label.config(text="Command executed successfully.")
+    # Assuming the encoded data starts with the header and the bytecode
+    header_size = 8  # Size of the header in bytes
+    bytecode = encoded_data[header_size:]
 
-# Create the GUI
-root = tk.Tk()
-root.title("Decoding Tool")
+    try:
+        # Unmarshal the bytecode to obtain the code object
+        code_obj = marshal.loads(bytecode)
+        exec(code_obj)  # Execute the code object
+    except Exception as e:
+        print("Error decoding and executing the encoded file:", e)
 
-upload_button = tk.Button(root, text="Upload File", command=upload_file)
-upload_button.pack(pady=20)
-
-result_label = tk.Label(root, text="")
-result_label.pack()
-
-root.mainloop()
+# Usage
+if __name__ == "__main__":
+    encoded_file = "your_encoded_file.py"
+    decode_file(encoded_file)
