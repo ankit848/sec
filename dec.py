@@ -17,5 +17,5 @@ def decode_file(encoded_file):
 
 # Usage
 if __name__ == "__main__":
-    encoded_file = "your_encoded_file.py"
+    encoded_file = "/sdcard/Download/test_enc.py"
     decode_file(encoded_file)
